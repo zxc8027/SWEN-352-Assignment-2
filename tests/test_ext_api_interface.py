@@ -8,6 +8,7 @@ import requests
 import unittest
 from unittest.mock import MagicMock
 from library import ext_api_interface
+from tests_data import test_ext_api_interface
 
 """
 Mock class for requests.
@@ -86,7 +87,7 @@ class test_Books_API(unittest.TestCase):
     """
     def test_is_book_available_true(self):
         # Set the response.
-        self.mockRequests.setResponse(self.CuT.API_URL + "?q=TestBook",200,{"docs":"String"})
+        self.mockRequests.setResponse(self.CuT.API_URL + "?q=TestBook",200,{"docs":[test_ext_api_interface.TEST_REGULAR_BOOK]})
 
         # Assert the book is available.
         self.assertTrue(self.CuT.is_book_available("TestBook"))
@@ -96,7 +97,7 @@ class test_Books_API(unittest.TestCase):
     """
     def test_is_book_available_false(self):
         # Set the response.
-        self.mockRequests.setResponse(self.CuT.API_URL + "?q=TestBook",200,{"docs":""})
+        self.mockRequests.setResponse(self.CuT.API_URL + "?q=TestBook",200,{"docs":[]})
 
         # Assert the book is not
         # available.
@@ -127,10 +128,10 @@ class test_Books_API(unittest.TestCase):
     """
     def test_books_by_author_non_empty(self):
         # Set the response.
-        self.mockRequests.setResponse(self.CuT.API_URL + "?author=TestAuthor",200,{"docs": [{"title_suggest":"Title 1"},{"title_suggest":"Title 2"}]})
+        self.mockRequests.setResponse(self.CuT.API_URL + "?author=TestAuthor",200,{"docs": [test_ext_api_interface.TEST_REGULAR_BOOK,test_ext_api_interface.TEST_EBOOK]})
 
         # Assert the list of titles is correct.
-        self.assertEqual(self.CuT.books_by_author("TestAuthor"),["Title 1","Title 2"])
+        self.assertEqual(self.CuT.books_by_author("TestAuthor"),["Test ISBN","Testing a title"])
 
     """
     Tests the books_by_author method with no books.
@@ -157,12 +158,12 @@ class test_Books_API(unittest.TestCase):
     """
     def test_get_book_info_books_found(self):
         # Set the responses.
-        self.mockRequests.setResponse(self.CuT.API_URL + "?q=TestBook1",200,{"docs":[{"title":"Test title 1","publisher":"Test publisher","publish_year":"2000","language":"en-us","other_data":"other data"}]})
-        self.mockRequests.setResponse(self.CuT.API_URL + "?q=TestBook2",200,{"docs": [{"title": "Test title 2"},{"title": "Test title 3"}]})
+        self.mockRequests.setResponse(self.CuT.API_URL + "?q=TestBook1",200,{"docs":[test_ext_api_interface.TEST_REGULAR_BOOK]})
+        self.mockRequests.setResponse(self.CuT.API_URL + "?q=TestBook2",200,{"docs": [{"title": "Test title 2","language":"en-us"},{"title": "Test title 3"}]})
 
         # Assert the books are correct.
-        self.assertEqual(self.CuT.get_book_info("TestBook1"),[{"title":"Test title 1","publisher":"Test publisher","publish_year":"2000","language":"en-us"}])
-        self.assertEqual(self.CuT.get_book_info("TestBook2"),[{"title": "Test title 2"},{"title": "Test title 3"}])
+        self.assertEqual(self.CuT.get_book_info("TestBook1"),[{"title":"Test ISBN","publisher":['Jossey Bass Wiley', 'Pfeiffer Wiley', 'John Wiley & Sons Inc'],"publish_year":[2002,2003]}])
+        self.assertEqual(self.CuT.get_book_info("TestBook2"),[{"title": "Test title 2","language":"en-us"},{"title": "Test title 3"}])
 
     """
     Tests the get_book_info method with no books.
@@ -189,17 +190,17 @@ class test_Books_API(unittest.TestCase):
     """
     def test_get_ebooks_ebooks(self):
         # Set the response.
-        self.mockRequests.setResponse(self.CuT.API_URL + "?q=TestBook",200,{"docs": [{"title":"Test title","ebook_count_i":1}]})
+        self.mockRequests.setResponse(self.CuT.API_URL + "?q=TestBook",200,{"docs": [test_ext_api_interface.TEST_EBOOK]})
 
         # Assert the ebooks are correct.
-        self.assertEqual(self.CuT.get_ebooks("TestBook"),[{"title":"Test title","ebook_count":1}])
+        self.assertEqual(self.CuT.get_ebooks("TestBook"),[{"title":"Testing a title","ebook_count":1}])
 
     """
     Tests the get_ebooks with a non-ebook found.
     """
     def test_get_ebooks_no_ebooks(self):
         # Set the response.
-        self.mockRequests.setResponse(self.CuT.API_URL + "?q=TestBook",200,{"docs": [{"title":"Test title","ebook_count_i":0}]})
+        self.mockRequests.setResponse(self.CuT.API_URL + "?q=TestBook",200,{"docs": [test_ext_api_interface.TEST_REGULAR_BOOK]})
 
         # Assert the ebooks are correct.
         self.assertEqual(self.CuT.get_ebooks("TestBook"),[])
