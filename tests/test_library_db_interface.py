@@ -4,7 +4,6 @@ from library import library_db_interface
 from tests_data import test_library_db_interface
 
 
-
 class test_LibraryDB(unittest.TestCase):
 
     def setUp(self):
@@ -19,11 +18,13 @@ class test_LibraryDB(unittest.TestCase):
         library_db_interface.Patron.get_memberID = MagicMock(return_value=123)
         self.p = library_db_interface.Patron
 
-
     def tearDown(self) -> None:
         self.lib.close_db()
         library_db_interface.os.remove('db.json')
 
+    """
+        test for inserting a patron covering duplicate patron, no person
+    """
     def test_insertPatron(self):
         self.assertEqual(None, self.lib.insert_patron(None))
         self.assertEqual(self.lib.get_patron_count(), 0, 'There are not 0 patrons in the database')
@@ -40,7 +41,9 @@ class test_LibraryDB(unittest.TestCase):
         self.p.get_lname.assert_called()
         self.assertEqual(self.lib.get_patron_count(), 1, 'There should be 1 patron in the database')
 
-
+    """
+        testing retrieving patrons getting one, getting 2 of them
+    """
     def test_get_all_patrons(self):
         self.lib.insert_patron(self.p)
         self.assertEqual(self.lib.get_patron_count(), 1, 'There should be 1 patron in the database')
@@ -54,6 +57,10 @@ class test_LibraryDB(unittest.TestCase):
         self.assertEqual(self.lib.get_patron_count(), 2, 'There should be 2 patrons in the database')
         self.assertEqual(test_library_db_interface.EXPECTED, self.lib.get_all_patrons())
 
+    """
+        testing updating patrons updating first name and last name,
+        testing attempting a none with none
+    """
     def test_update_patron(self):
         self.lib.insert_patron(self.p)
         self.assertEqual(self.lib.get_patron_count(), 1, 'There should be 1 patron in the database')
@@ -68,6 +75,10 @@ class test_LibraryDB(unittest.TestCase):
         self.assertEqual(self.lib.get_patron_count(), 1, 'There should be 1 patron in the database')
         self.assertEqual(None, self.lib.update_patron(None))
 
+    """
+        test retrieve patron existing in the database
+        test a non existent person in the database that it returns None
+    """
     def test_retrieve_patron(self):
         self.lib.insert_patron(self.p)
         self.assertEqual(self.lib.get_patron_count(), 1, 'There should be 1 patron in the database')
