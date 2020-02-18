@@ -109,25 +109,30 @@ class test_Library(unittest.TestCase):
   """
   Tests the borrow_book method
   """
-  def test_borrow_book(self):
-    patron = Patron("FirstName", "LastName", 24, 1)
+  @patch('library.library.Patron')
+  @patch('library.library.Library_DB')
+  def test_borrow_book(self,mockLibraryDB,mockPatron):
     book = "Book01"
     CuT = Library()
-    CuT.borrow_book(book,patron)
-    self.assertEquals(patron.get_borrowed_books(),["book01"])
+    mockLibraryDB_instance = mockLibraryDB.return_value
+    mockPatron_instance = mockPatron.return_value
+    CuT.borrow_book(book,mockPatron_instance)
+    mockLibraryDB_instance.update_patron.assert_called_once()
+    mockPatron_instance.add_borrowed_book.assert_called_once()
 
   """
   Tests the return_borrowed_book method
   """
-  def test_return_borrowed_book(self):
-    patron = Patron("FirstName", "LastName", 24, 1)
+  @patch('library.library.Patron')
+  @patch('library.library.Library_DB')
+  def test_return_borrowed_book(self,mockLibraryDB,mockPatron):
     book = "book01"
-    book2 = "book02"
     CuT = Library()
-    CuT.borrow_book(book,patron)
-    CuT.borrow_book(book2,patron)
-    CuT.return_borrowed_book(book,patron)
-    self.assertEquals(patron.get_borrowed_books(), ["book02"])
+    mockLibraryDB_instance = mockLibraryDB.return_value
+    mockPatron_instance = mockPatron.return_value
+    CuT.return_borrowed_book(book,mockPatron_instance)
+    mockLibraryDB_instance.update_patron.assert_called_once()
+    mockPatron_instance.return_borrowed_book.assert_called_once()
 
   """
   Tests the is_book_borrowed with book in patron's borrowed book list
