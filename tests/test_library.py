@@ -19,6 +19,7 @@ class test_Library(unittest.TestCase):
     mockBooksAPI_instance = mockBooksAPI.return_value
     mockBooksAPI_instance.get_ebooks.return_value = [{"title":"Title","ebook_count":2}]
     self.assertTrue(CuT.is_ebook("Title"),"'Test title' should be in ebooks")
+    CuT.db.close_db()
 
   """
   Tests the is_ebook method, with book not in ebooks
@@ -29,6 +30,7 @@ class test_Library(unittest.TestCase):
     mockBooksAPI_instance = mockBooksAPI.return_value
     mockBooksAPI_instance.get_ebooks.return_value = [{"title": "Title", "ebook_count": 2}]
     self.assertFalse(CuT.is_ebook("Title_Not_In_ebooks"), "'Title_Not_in_ebooks' should not be in ebooks")
+    CuT.db.close_db()
 
   """
   Tests the get_ebooks_count method
@@ -39,6 +41,7 @@ class test_Library(unittest.TestCase):
     mockBooksAPI_instance = mockBooksAPI.return_value
     mockBooksAPI_instance.get_ebooks.return_value = [{"title": "Title", "ebook_count": 2}]
     self.assertEqual(CuT.get_ebooks_count("Test title"),2,"ebook count should be 2")
+    CuT.db.close_db()
 
   """
   Tests the is_book_by_author method with book on authors book list
@@ -50,6 +53,7 @@ class test_Library(unittest.TestCase):
     mockBooksAPI_instance = mockBooksAPI.return_value
     mockBooksAPI_instance.books_by_author.return_value = ["Book01","Book02","Book03"]
     self.assertTrue(CuT.is_book_by_author("TestAuthor","Book02"), "Book02 should be in author's book list")
+    CuT.db.close_db()
 
   """
   Tests the is_book_by_author method with book not on authors book list
@@ -60,6 +64,7 @@ class test_Library(unittest.TestCase):
     mockBooksAPI_instance = mockBooksAPI.return_value
     mockBooksAPI_instance.books_by_author.return_value = ["Book01", "Book02", "Book03"]
     self.assertFalse(CuT.is_book_by_author("TestAuthor","Book04"), "Book04 should not be in author's book list")
+    CuT.db.close_db()
 
   """
   Tests the get_languages_for_book method 
@@ -71,6 +76,7 @@ class test_Library(unittest.TestCase):
     mockBooksAPI_instance = mockBooksAPI.return_value
     mockBooksAPI_instance.get_book_info.return_value = [{"title": "Test title", "publisher": "Test publisher", "language": ["eng","fre","ger"]}]
     self.assertEqual(CuT.get_languages_for_book("Test title"),{"eng","fre","ger"},"Book languages should include eng, fre, ger")
+    CuT.db.close_db()
 
   """
   Tests the register_patron method
@@ -83,6 +89,7 @@ class test_Library(unittest.TestCase):
     mockLibraryDB_instance.insert_patron.return_value = patron_inserted.get_memberID()
     self.assertEqual(CuT.register_patron("Kevin","Smith",24,1),1,"MemberID should be one")
     mockLibraryDB_instance.insert_patron.assert_called_once()
+    CuT.db.close_db()
 
   """
   Tests the is_patron_registered method true
@@ -94,6 +101,7 @@ class test_Library(unittest.TestCase):
     mockLibraryDB_instance = mockLibraryDB.return_value
     mockLibraryDB_instance.retrieve_patron.return_value = patron
     self.assertTrue(CuT.is_patron_registered(patron))
+    CuT.db.close_db()
 
   """
   Tests the is_patron_registered method false
@@ -105,6 +113,7 @@ class test_Library(unittest.TestCase):
     mockLibraryDB_instance = mockLibraryDB.return_value
     mockLibraryDB_instance.retrieve_patron.return_value = None
     self.assertFalse(CuT.is_patron_registered(patron))
+    CuT.db.close_db()
 
   """
   Tests the borrow_book method
@@ -119,6 +128,7 @@ class test_Library(unittest.TestCase):
     CuT.borrow_book(book,mockPatron_instance)
     mockLibraryDB_instance.update_patron.assert_called_once()
     mockPatron_instance.add_borrowed_book.assert_called_once()
+    CuT.db.close_db()
 
   """
   Tests the return_borrowed_book method
@@ -133,6 +143,7 @@ class test_Library(unittest.TestCase):
     CuT.return_borrowed_book(book,mockPatron_instance)
     mockLibraryDB_instance.update_patron.assert_called_once()
     mockPatron_instance.return_borrowed_book.assert_called_once()
+    CuT.db.close_db()
 
   """
   Tests the is_book_borrowed with book in patron's borrowed book list
@@ -144,3 +155,4 @@ class test_Library(unittest.TestCase):
     mockPatron_instance.get_borrowed_books.return_value = ["book1","book2","book3"]
     borrowed_book = "Book3"
     self.assertTrue(CuT.is_book_borrowed(borrowed_book,mockPatron_instance),"Book03 should be in Patron's book list")
+    CuT.db.close_db()
