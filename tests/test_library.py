@@ -7,8 +7,13 @@ import unittest
 from unittest.mock import Mock, MagicMock, patch
 from library.library import Library
 from library.patron import Patron
+from library import library_db_interface
 
 class test_Library(unittest.TestCase):
+
+  def tearDown(self) -> None:
+    self.lib.close_db()
+    library_db_interface.os.remove('db.json')
 
   """
   Tests the is_ebook method, with book in ebooks
@@ -70,7 +75,7 @@ class test_Library(unittest.TestCase):
     CuT = Library()
     mockBooksAPI_instance = mockBooksAPI.return_value
     mockBooksAPI_instance.get_book_info.return_value = [{"title": "Test title", "publisher": "Test publisher", "language": ["eng","fre","ger"]}]
-    self.assertEquals(CuT.get_languages_for_book("Test title"),{"eng","fre","ger"},"Book languages should include eng, fre, ger")
+    self.assertEqual(CuT.get_languages_for_book("Test title"),{"eng","fre","ger"},"Book languages should include eng, fre, ger")
 
   """
   Tests the register_patron method
