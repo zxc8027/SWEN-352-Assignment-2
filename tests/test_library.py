@@ -7,13 +7,8 @@ import unittest
 from unittest.mock import Mock, MagicMock, patch
 from library.library import Library
 from library.patron import Patron
-from library import library_db_interface
 
 class test_Library(unittest.TestCase):
-
-  def tearDown(self) -> None:
-    self.lib.close_db()
-    library_db_interface.os.remove('db.json')
 
   """
   Tests the is_ebook method, with book in ebooks
